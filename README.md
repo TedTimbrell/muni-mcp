@@ -27,14 +27,18 @@ This project provides an MCP-compatible server that acts as a bridge between LLM
    cd muni-mcp
    ```
 
-2. Build the server:
+2. Build the server for your platform:
    ```
    go build -o muni-mcp ./cmd/server
    ```
 
-#### Option 2: Cross-Platform Builds
+#### Option 2: Existing Cross-Platform Builds
 
-You can build binaries for multiple platforms using the provided build script:
+Prebuilt binaries for multiple platforms are listed in our releases.
+``
+
+If you don't trust a random person on the internet you can run the multiplatform build with the following,
+
 
 1. Make the build script executable:
    ```
@@ -57,6 +61,24 @@ The binaries will be available in the `build` directory with platform-specific n
 - `muni-mcp-linux-amd64` (Linux x86_64)
 - `muni-mcp-linux-arm64` (Linux ARM64)
 - `muni-mcp-windows-amd64.exe` (Windows x86_64)
+
+
+#### MCP Config
+
+Simply allow exectution of the bianry and place add this to your application's MCP config. Make sure to replace the command with the correct path to the binrary. `realpath <file>` is helpful for finding its absolute path.
+
+```
+{
+  ...
+  "mcpServers": {
+    "muni-mcp": {
+      "command": "/path/to/binary",
+      "args": []
+    }
+  },
+  ...
+}
+`
 
 ### Environment Variables
 
