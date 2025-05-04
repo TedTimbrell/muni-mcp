@@ -9,6 +9,9 @@ muni-mcp
 # Build output directory
 build/
 
+# HAR examples
+har_examples/
+
 # Test binary, built with `go test -c`
 *.test
 
