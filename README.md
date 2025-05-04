@@ -6,10 +6,8 @@ A Model Context Protocol (MCP) server for interacting with San Francisco's MUNI 
 
 This project provides an MCP-compatible server that acts as a bridge between LLM applications and the SF MUNI API. It allows AI applications to query real-time public transit data, such as:
 
-- Transit routes
-- Vehicle locations
-- Arrival predictions
-- Service alerts
+- Transit routes and route details
+- Real-time arrival predictions at stops
 
 ## Getting Started
 
@@ -35,10 +33,8 @@ This project provides an MCP-compatible server that acts as a bridge between LLM
 #### Option 2: Existing Cross-Platform Builds
 
 Prebuilt binaries for multiple platforms are listed in our releases.
-``
 
 If you don't trust a random person on the internet you can run the multiplatform build with the following,
-
 
 1. Make the build script executable:
    ```
@@ -61,7 +57,6 @@ The binaries will be available in the `build` directory with platform-specific n
 - `muni-mcp-linux-amd64` (Linux x86_64)
 - `muni-mcp-linux-arm64` (Linux ARM64)
 - `muni-mcp-windows-amd64.exe` (Windows x86_64)
-
 
 #### MCP Config
 
