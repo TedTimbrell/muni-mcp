@@ -19,6 +19,8 @@ This project provides an MCP-compatible server that acts as a bridge between LLM
 
 ### Installation
 
+#### Option 1: Build from Source
+
 1. Clone the repository:
    ```
    git clone https://github.com/tedtimbrell/muni-mcp.git
@@ -29,6 +31,32 @@ This project provides an MCP-compatible server that acts as a bridge between LLM
    ```
    go build -o muni-mcp ./cmd/server
    ```
+
+#### Option 2: Cross-Platform Builds
+
+You can build binaries for multiple platforms using the provided build script:
+
+1. Make the build script executable:
+   ```
+   chmod +x scripts/build.sh
+   ```
+
+2. Run the build script:
+   ```
+   ./scripts/build.sh
+   ```
+
+This will generate binaries for:
+- macOS (Intel and Apple Silicon)
+- Linux (x86_64 and ARM64)
+- Windows (x86_64)
+
+The binaries will be available in the `build` directory with platform-specific names:
+- `muni-mcp-darwin-amd64` (macOS Intel)
+- `muni-mcp-darwin-arm64` (macOS Apple Silicon)
+- `muni-mcp-linux-amd64` (Linux x86_64)
+- `muni-mcp-linux-arm64` (Linux ARM64)
+- `muni-mcp-windows-amd64.exe` (Windows x86_64)
 
 ### Environment Variables
 

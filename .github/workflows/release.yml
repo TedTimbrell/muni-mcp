@@ -1,0 +1,44 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          
+      - name: Build using build.sh
+        run: |
+          chmod +x scripts/build.sh
+          ./scripts/build.sh
+          
+          # Create ZIP archives for each binary
+          cd build
+          zip muni-mcp-linux-amd64.zip muni-mcp-linux-amd64
+          zip muni-mcp-linux-arm64.zip muni-mcp-linux-arm64
+          zip muni-mcp-darwin-amd64.zip muni-mcp-darwin-amd64
+          zip muni-mcp-darwin-arm64.zip muni-mcp-darwin-arm64
+          zip muni-mcp-windows-amd64.zip muni-mcp-windows-amd64.exe
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/muni-mcp-linux-amd64.zip
+            build/muni-mcp-linux-arm64.zip
+            build/muni-mcp-darwin-amd64.zip
+            build/muni-mcp-darwin-arm64.zip
+            build/muni-mcp-windows-amd64.zip
+          generate_release_notes: true 

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -163,6 +165,13 @@ func (c *Client) DisableCache() {
 	c.cache.disable()
 }
 
+// Add helper function at the top of the file after package declaration
+func closeBody(body io.ReadCloser) {
+	if err := body.Close(); err != nil {
+		log.Printf("Error closing response body: %v", err)
+	}
+}
+
 // GetAllRoutes fetches all available MUNI routes with detailed information
 func (c *Client) GetAllRoutes(ctx context.Context) ([]RouteInfo, error) {
 	cacheKey := "all_routes"
@@ -186,7 +195,7 @@ func (c *Client) GetAllRoutes(ctx context.Context) ([]RouteInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer closeBody(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
@@ -229,7 +238,7 @@ func (c *Client) GetRouteDetails(ctx context.Context, routeID string) (*RouteDet
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer closeBody(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
@@ -268,7 +277,7 @@ func (c *Client) GetPredictions(ctx context.Context, routeID, stopID string) ([]
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer closeBody(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
