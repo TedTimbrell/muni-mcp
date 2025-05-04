@@ -16,7 +16,6 @@ This project provides an MCP-compatible server that acts as a bridge between LLM
 ### Prerequisites
 
 - Go 1.20 or higher
-- SF MUNI API credentials (for production use)
 
 ### Installation
 
@@ -36,7 +35,6 @@ This project provides an MCP-compatible server that acts as a bridge between LLM
 The server can be configured using the following environment variables:
 
 - `MUNI_API_BASE_URL`: The base URL for the SF MUNI API (default: https://api.sfmta.com/v1)
-- `MUNI_API_KEY`: Your API key for the SF MUNI API
 
 ### Running the Server
 
@@ -165,4 +163,4 @@ To add new tools to the MCP server, modify the `main.go` file in the `cmd/server
 
 ## License
 
-MIT 
+MIT

@@ -13,6 +13,8 @@ import (
 	"github.com/tedtimbrell/muni-mcp/pkg/muni"
 )
 
+const defaultBaseURL = "https://api.prd-1.iq.live.umoiq.com"
+
 // MuniClient is the interface for interacting with the MUNI API
 type MuniClient interface {
 	GetAllRoutes(ctx context.Context) ([]muni.RouteInfo, error)
@@ -26,24 +28,13 @@ type MuniClient interface {
 var muniClient MuniClient
 
 func main() {
-	// Initialize MUNI client
-	// In a production environment, these would come from environment variables
 	baseURL := os.Getenv("MUNI_API_BASE_URL")
 	if baseURL == "" {
-		baseURL = "https://api.prd-1.iq.live.umoiq.com" // Default URL based on HAR files
+		baseURL = defaultBaseURL
 	}
 
-	apiKey := os.Getenv("MUNI_API_KEY")
-	cacheTTL := 5 * time.Minute
-
-	// Parse cache TTL from environment if present
-	if ttlStr := os.Getenv("MUNI_CACHE_TTL"); ttlStr != "" {
-		if parsedTTL, err := time.ParseDuration(ttlStr); err == nil {
-			cacheTTL = parsedTTL
-		}
-	}
-
-	muniClient = muni.NewClient(baseURL, apiKey, muni.WithCacheTTL(cacheTTL))
+	cacheTTL := 5 * time.Minute // Default cache TTL
+	muniClient = muni.NewClient(baseURL, muni.WithCacheTTL(cacheTTL))
 
 	// Create MCP server
 	s := server.NewMCPServer(

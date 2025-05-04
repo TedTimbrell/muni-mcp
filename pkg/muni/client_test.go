@@ -7,32 +7,43 @@ import (
 )
 
 func TestNewClient(t *testing.T) {
-	baseURL := "https://test-api.example.com"
-	apiKey := "test-api-key"
-
-	client := NewClient(baseURL, apiKey)
+	baseURL := "http://test.com"
+	client := NewClient(baseURL)
 
 	if client.baseURL != baseURL {
 		t.Errorf("Expected baseURL to be %s, got %s", baseURL, client.baseURL)
-	}
-
-	if client.apiKey != apiKey {
-		t.Errorf("Expected apiKey to be %s, got %s", apiKey, client.apiKey)
 	}
 
 	if client.httpClient == nil {
 		t.Error("Expected httpClient to be initialized")
 	}
 
-	if client.httpClient.Timeout != 10*time.Second {
-		t.Errorf("Expected timeout to be %s, got %s", 10*time.Second, client.httpClient.Timeout)
+	if client.cache == nil {
+		t.Error("Expected cache to be initialized")
 	}
 }
 
-func TestGetRoutes(t *testing.T) {
-	client := NewClient("https://test-api.example.com", "test-api-key")
+func TestClientOptions(t *testing.T) {
+	// Test WithCacheTTL option
+	ttl := 10 * time.Minute
+	client := NewClient("http://test.com", WithCacheTTL(ttl))
+	if client.cache.ttl != ttl {
+		t.Errorf("Expected cache TTL to be %v, got %v", ttl, client.cache.ttl)
+	}
 
-	routes, err := client.GetRoutes(context.Background())
+	// Test WithoutCache option
+	client = NewClient("http://test.com", WithoutCache())
+	if client.cache.isEnabled {
+		t.Error("Expected cache to be disabled")
+	}
+}
+
+func TestGetAllRoutes(t *testing.T) {
+	server := mockServer(mockRoutesResponse)
+	defer server.Close()
+
+	client := NewClient(server.URL)
+	routes, err := client.GetAllRoutes(context.Background())
 
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
@@ -47,12 +58,8 @@ func TestGetRoutes(t *testing.T) {
 		t.Errorf("Expected route ID to be N, got %s", routes[0].ID)
 	}
 
-	if routes[0].Name != "N-Judah" {
-		t.Errorf("Expected route name to be N-Judah, got %s", routes[0].Name)
-	}
-
-	if routes[0].Type != "light_rail" {
-		t.Errorf("Expected route type to be light_rail, got %s", routes[0].Type)
+	if routes[0].Title != "N-Judah" {
+		t.Errorf("Expected route title to be N-Judah, got %s", routes[0].Title)
 	}
 
 	// Check second route
@@ -60,60 +67,108 @@ func TestGetRoutes(t *testing.T) {
 		t.Errorf("Expected route ID to be J, got %s", routes[1].ID)
 	}
 
-	if routes[1].Name != "J-Church" {
-		t.Errorf("Expected route name to be J-Church, got %s", routes[1].Name)
-	}
-
-	if routes[1].Type != "light_rail" {
-		t.Errorf("Expected route type to be light_rail, got %s", routes[1].Type)
+	if routes[1].Title != "J-Church" {
+		t.Errorf("Expected route title to be J-Church, got %s", routes[1].Title)
 	}
 }
 
-func TestGetVehicleLocations(t *testing.T) {
-	client := NewClient("https://test-api.example.com", "test-api-key")
+func TestGetRouteDetails(t *testing.T) {
+	server := mockServer(mockRouteDetailsResponse)
+	defer server.Close()
+
+	client := NewClient(server.URL)
 
 	// Test with valid route ID
 	routeID := "N"
-	vehicles, err := client.GetVehicleLocations(context.Background(), routeID)
+	details, err := client.GetRouteDetails(context.Background(), routeID)
 
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
 
-	if len(vehicles) != 1 {
-		t.Errorf("Expected 1 vehicle, got %d", len(vehicles))
+	if details.ID != routeID {
+		t.Errorf("Expected route ID to be %s, got %s", routeID, details.ID)
 	}
 
-	vehicle := vehicles[0]
-
-	if vehicle.VehicleID != "1234" {
-		t.Errorf("Expected vehicle ID to be 1234, got %s", vehicle.VehicleID)
+	if len(details.Stops) != 1 {
+		t.Errorf("Expected 1 stop, got %d", len(details.Stops))
 	}
 
-	if vehicle.RouteID != routeID {
-		t.Errorf("Expected route ID to be %s, got %s", routeID, vehicle.RouteID)
-	}
-
-	if vehicle.Latitude != 37.7749 {
-		t.Errorf("Expected latitude to be 37.7749, got %f", vehicle.Latitude)
-	}
-
-	if vehicle.Longitude != -122.4194 {
-		t.Errorf("Expected longitude to be -122.4194, got %f", vehicle.Longitude)
-	}
-
-	if vehicle.Heading != 90 {
-		t.Errorf("Expected heading to be 90, got %d", vehicle.Heading)
-	}
-
-	if vehicle.Speed != 15.5 {
-		t.Errorf("Expected speed to be 15.5, got %f", vehicle.Speed)
+	if details.Stops[0].ID != "1234" {
+		t.Errorf("Expected stop ID to be 1234, got %s", details.Stops[0].ID)
 	}
 
 	// Test with empty route ID
-	_, err = client.GetVehicleLocations(context.Background(), "")
+	_, err = client.GetRouteDetails(context.Background(), "")
+	if err != ErrRouteIDRequired {
+		t.Errorf("Expected ErrRouteIDRequired, got %v", err)
+	}
+}
 
-	if err == nil {
-		t.Error("Expected error for empty route ID, got nil")
+func TestGetPredictions(t *testing.T) {
+	server := mockServer(mockPredictionsResponse)
+	defer server.Close()
+
+	client := NewClient(server.URL)
+
+	// Test with valid route and stop IDs
+	routeID := "N"
+	stopID := "1234"
+	predictions, err := client.GetPredictions(context.Background(), routeID, stopID)
+
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+
+	if len(predictions) == 0 {
+		t.Error("Expected predictions, got none")
+	}
+
+	prediction := predictions[0]
+	if prediction.VehicleID != "1234" {
+		t.Errorf("Expected vehicle ID to be 1234, got %s", prediction.VehicleID)
+	}
+
+	if prediction.Minutes != 5 {
+		t.Errorf("Expected minutes to be 5, got %d", prediction.Minutes)
+	}
+
+	if prediction.Direction != "Inbound" {
+		t.Errorf("Expected direction to be Inbound, got %s", prediction.Direction)
+	}
+
+	// Test with empty route ID
+	_, err = client.GetPredictions(context.Background(), "", stopID)
+	if err != ErrRouteIDRequired {
+		t.Errorf("Expected ErrRouteIDRequired, got %v", err)
+	}
+
+	// Test with empty stop ID
+	_, err = client.GetPredictions(context.Background(), routeID, "")
+	if err != ErrStopIDRequired {
+		t.Errorf("Expected ErrStopIDRequired, got %v", err)
+	}
+}
+
+func TestCacheOperations(t *testing.T) {
+	client := NewClient("https://test-api.example.com")
+
+	// Test cache enable/disable
+	client.DisableCache()
+	if client.cache.isEnabled {
+		t.Error("Expected cache to be disabled")
+	}
+
+	client.EnableCache()
+	if !client.cache.isEnabled {
+		t.Error("Expected cache to be enabled")
+	}
+
+	// Test cache clear
+	client.cache.set("test", "data")
+	client.ClearCache()
+	var result string
+	if client.cache.get("test", &result) {
+		t.Error("Expected cache to be empty after clear")
 	}
 }

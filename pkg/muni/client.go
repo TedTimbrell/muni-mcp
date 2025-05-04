@@ -110,9 +110,8 @@ func (c *Cache) disable() {
 
 // Client represents a client for the SF MUNI API
 type Client struct {
-	httpClient *http.Client
 	baseURL    string
-	apiKey     string
+	httpClient *http.Client
 	cache      *Cache
 }
 
@@ -134,22 +133,19 @@ func WithoutCache() ClientOption {
 }
 
 // NewClient creates a new MUNI API client
-func NewClient(baseURL, apiKey string, opts ...ClientOption) *Client {
-	client := &Client{
-		httpClient: &http.Client{
-			Timeout: 10 * time.Second,
-		},
-		baseURL: baseURL,
-		apiKey:  apiKey,
-		cache:   newCache(5 * time.Minute), // Default cache TTL
+func NewClient(baseURL string, opts ...ClientOption) *Client {
+	c := &Client{
+		baseURL:    baseURL,
+		httpClient: &http.Client{},
+		cache:      newCache(5 * time.Minute), // Default cache TTL
 	}
 
 	// Apply options
 	for _, opt := range opts {
-		opt(client)
+		opt(c)
 	}
 
-	return client
+	return c
 }
 
 // ClearCache clears all cached responses
