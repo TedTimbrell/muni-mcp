@@ -134,7 +134,7 @@ Get real-time arrival/departure predictions for a specific stop on a route.
 
 ### toggle_cache
 
-Enable or disable caching of MUNI API responses.
+Enable or disable caching of MUNI API responses. Defaults on to spare the poor MUNI API
 
 **Parameters:**
 - `enabled` (boolean, required): Set to true to enable caching, false to disable
