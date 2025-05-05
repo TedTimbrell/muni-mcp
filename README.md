@@ -11,13 +11,37 @@ This project provides an MCP-compatible server that acts as a bridge between LLM
 
 ## Getting Started
 
-### Prerequisites
-
-- Go 1.20 or higher
-
 ### Installation
 
-#### Option 1: Build from Source
+Download your system's binary from the latest release [here](https://github.com/TedTimbrell/muni-mcp/releases) or, if you don't trust a random asshole on the internet, build the binary from source [below](#building-from-source).
+
+
+
+
+Simply allow exectution of the bianry and run `chmod +x <path_to_binary>`. Then, add the JSON below to your application's MCP config. Make sure to replace the command with the correct path to the binrary. `realpath <file>` is helpful for finding its absolute path.
+
+```
+{
+  ...
+  "mcpServers": {
+    "muni-mcp": {
+      "command": "/path/to/binary",
+      "args": []
+    }
+  },
+  ...
+}
+```
+
+### Environment Variables
+
+The server can be configured using the following environment variables:
+
+- `MUNI_API_BASE_URL`: The base URL for the SF MUNI API (default: https://api.sfmta.com/v1)
+
+
+### Buiilding from source
+
 
 1. Clone the repository:
    ```
@@ -25,23 +49,12 @@ This project provides an MCP-compatible server that acts as a bridge between LLM
    cd muni-mcp
    ```
 
-2. Build the server for your platform:
-   ```
-   go build -o muni-mcp ./cmd/server
-   ```
-
-#### Option 2: Existing Cross-Platform Builds
-
-Prebuilt binaries for multiple platforms are listed in our releases.
-
-If you don't trust a random person on the internet you can run the multiplatform build with the following,
-
-1. Make the build script executable:
+2. Make the build script executable:
    ```
    chmod +x scripts/build.sh
    ```
 
-2. Run the build script:
+3. Run the build script:
    ```
    ./scripts/build.sh
    ```
@@ -58,36 +71,6 @@ The binaries will be available in the `build` directory with platform-specific n
 - `muni-mcp-linux-arm64` (Linux ARM64)
 - `muni-mcp-windows-amd64.exe` (Windows x86_64)
 
-#### MCP Config
-
-Simply allow exectution of the bianry and place add this to your application's MCP config. Make sure to replace the command with the correct path to the binrary. `realpath <file>` is helpful for finding its absolute path.
-
-```
-{
-  ...
-  "mcpServers": {
-    "muni-mcp": {
-      "command": "/path/to/binary",
-      "args": []
-    }
-  },
-  ...
-}
-`
-
-### Environment Variables
-
-The server can be configured using the following environment variables:
-
-- `MUNI_API_BASE_URL`: The base URL for the SF MUNI API (default: https://api.sfmta.com/v1)
-
-### Running the Server
-
-```
-./muni-mcp
-```
-
-The server will start and listen for MCP protocol requests on stdin/stdout.
 
 ## Available Tools
 
