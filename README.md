@@ -13,7 +13,7 @@ This project provides an MCP-compatible server that acts as a bridge between LLM
 
 ### Installation
 
-Download your system's binary from the latest release [here](https://github.com/TedTimbrell/muni-mcp/releases) or, if you don't trust a random asshole on the internet, build the binary from source [below](#building-from-source).
+This project is written in Go, so the MCP server is just a simple binary file. Download your system's compatible binary from the latest release [here](https://github.com/TedTimbrell/muni-mcp/releases) or, if you don't trust a random asshole on the internet, build the binary from source [below](#building-from-source).
 
 
 
@@ -40,7 +40,7 @@ The server can be configured using the following environment variables:
 - `MUNI_API_BASE_URL`: The base URL for the SF MUNI API (default: https://api.sfmta.com/v1)
 
 
-### Buiilding from source
+### Building from source
 
 
 1. Clone the repository:
