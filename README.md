@@ -35,9 +35,9 @@ Simply allow exectution of the bianry and run `chmod +x <path_to_binary>`. Then,
 
 ### Environment Variables
 
-The server can be configured using the following environment variables:
+You can override the API URL with the following environment variable:
 
-- `MUNI_API_BASE_URL`: The base URL for the SF MUNI API (default: https://api.sfmta.com/v1)
+- `MUNI_API_BASE_URL`: The base URL for the SF MUNI API
 
 
 ### Building from source
